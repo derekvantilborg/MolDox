@@ -3,9 +3,37 @@ from meeko import MoleculePreparation
 from meeko import obutils
 from openbabel import pybel, openbabel
 import os
+import time
+
+# def sanitize_mol(infile, outfile, overwrite=True):
+#     """
+#
+#     :param infile: (str) pathname to input mol2 file
+#     :param outfile: (str) pathname to output mol2 file
+#     :param overwrite: (bool) if True, overwrite existing outfile
+#     """
+#     # read molecule from file
+#     mol = [m for m in pybel.readfile(filename=infile, format=infile.split('.')[-1])][0]
+#     # Add hydrogens
+#     mol.addh()
+#     # Write to output file
+#     out = pybel.Outputfile(filename=outfile, format=outfile.split('.')[-1], overwrite=overwrite)
+#     out.write(mol)
+#     out.close()
 
 
-def sanitize_mol(infile, outfile, overwrite=True):
+def prep_mol_from_file(infile, output_pdbqt, hydrate=False, keep_nonpolar_hydrogens=False, pH_value=None):
+    mol = obutils.load_molecule_from_file(infile)
+
+    preparator = MoleculePreparation(hydrate=hydrate,
+                                     keep_nonpolar_hydrogens=keep_nonpolar_hydrogens,
+                                     pH_value=pH_value)
+    preparator.prepare(mol)
+
+    preparator.write_pdbqt_file(output_pdbqt)
+
+
+def hydrogenate_mol_from_file(infile, outfile, overwrite=True):
     """
 
     :param infile: (str) pathname to input mol2 file
@@ -22,46 +50,60 @@ def sanitize_mol(infile, outfile, overwrite=True):
     out.close()
 
 
-def prepare_ligand(infile, output_pdbqt):
-    mol = obutils.load_molecule_from_file(infile)
+def prep_ligands(infile, format='sdf', output_dir='.', hydrogenate=True, hydrate=False, keep_nonpolar_hydrogens=False,
+                 pH_value=None, make3d=True, remake3d=False, forcefield='mmff94', steps_3d=50, steps_3d_localopt=500):
 
-    preparator = MoleculePreparation(hydrate=False)
-    preparator.prepare(mol)
-
-    preparator.write_pdbqt_file(output_pdbqt)
-
-
-def prep_single_ligand(infile, output_pdbqt):
-    """ Sanitize and hydrate a single molecule from a file. Create a pdbqt file suitable for Autodock Vina"""
-
-    sanitize_mol(infile, f"{infile.split('.')[-2]}_H.mol2")
-    prepare_ligand(f"{infile.split('.')[-2]}_H.mol2", output_pdbqt)
-
-
-def prep_ligands(infile, output_dir='.'):
-
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
-
-    mols = [m for m in pybel.readfile(filename=infile, format=infile.split('.')[-1])]
+    # Read file
+    mols = [m for m in pybel.readfile(filename=infile, format=format)]
 
     # Add hydrogens
+    if hydrogenate:
+        for m in mols:
+            m.addh()
+
+    # Make 3D if needed
     for m in mols:
-        m.addh()
+        z_coords = [a.coords[-1] for a in m.atoms]
+        if z_coords.count(0) == len(m.atoms):
+            print(f'All 0 Z-coordinates of molecule {m}'.strip())
+            if make3d:
+                print(f'\t3D coordinates are generated with the {forcefield} forcefield ({steps_3d} steps)')
+                m.make3D('mmff94', steps_3d)
+                if steps_3d_localopt > 0:
+                    print(f'\tPerforming local optimization ({steps_3d_localopt} steps)')
+                    m.localopt('mmff94', steps_3d_localopt)
+        elif remake3d:
+            if z_coords.count(0) == len(m.atoms):
+                print(f'Existing Z-coordinates, but new 3D coordinates are computed anyways for {m}'.strip())
+            print(f'\t3D coordinates are generated with the {forcefield} forcefield ({steps_3d} steps)')
+            m.make3D('mmff94', steps_3d)
+            if steps_3d_localopt > 0:
+                print(f'\tPerforming local optimization ({steps_3d_localopt} steps)')
+                m.localopt('mmff94', steps_3d_localopt)
 
-    for idx, mol in enumerate(mols):
+    # Prep for docking and write to file
+    for idx, m in enumerate(mols):
+        preparator = MoleculePreparation(hydrate=hydrate,
+                                         keep_nonpolar_hydrogens=keep_nonpolar_hydrogens,
+                                         pH_value=pH_value)
+        preparator.prepare(m.OBMol)
 
-        # Write to output file
-        out = pybel.Outputfile(filename=f"{output_dir}/{infile.split('.')[-2]}_temp_H.mol2",
-                               format='mol2', overwrite=True)
-        out.write(mol)
-        out.close()
+        preparator.write_pdbqt_file(f"{output_dir}/mol_{idx}.pdbqt")
 
-        prepare_ligand(f"{output_dir}/{infile.split('.')[-2]}_temp_H.mol2",
-                       f"{output_dir}/{infile.split('.')[-2]}_H_{idx}.pdbqt")
 
-        os.remove(f"{output_dir}/{infile.split('.')[-2]}_temp_H.mol2")
 
+# mol2
+# sdf
+
+# keep_nonpolar_hydrogens = False
+# hydrate = False
+# pH_value = None
+
+# print(m)
+#
+# f'{m}'.split('\t')[0]
+
+# Supported forcefields ['gaff', 'ghemical', 'mmff94', 'mmff94s', 'uff']
 
 # obconversion = openbabel.OBConversion()
 # obconversion.SetInFormat("sdf")

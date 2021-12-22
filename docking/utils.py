@@ -3,6 +3,20 @@ from openbabel import pybel
 from pymol import cmd
 
 
+def split_pdb(receptor, ligand, infile=None, fetch=None):
+
+    if infile is not None:
+        cmd.load(infile)
+    if fetch is not None:
+        cmd.fetch(code=fetch, type='pdb1')
+
+    cmd.select(name='Prot', selection='polymer.protein')
+    cmd.select(name='Lig', selection='organic')
+    cmd.save(filename=receptor, format='pdb', selection='Prot')
+    cmd.save(filename=ligand, format='mol2', selection='Lig')
+    cmd.delete('all')
+
+
 def find_box(receptor, ligand, receptor_format='pdb', ligand_format='mol2', box_extension=5):
     """ Get the box coordinates from the ligand and pdb
 

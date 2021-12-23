@@ -44,6 +44,7 @@ def find_box(receptor, ligand, receptor_format='pdb', ligand_format='mol2', box_
 
 
 def getbox(selection='sele', extending=6.0):
+    """ Took this function straight from https://github.com/AngelRuizMoreno/Jupyter_Dock """
 
     ([minX, minY, minZ], [maxX, maxY, maxZ]) = cmd.get_extent(selection)
 
@@ -68,6 +69,7 @@ def getbox(selection='sele', extending=6.0):
 
 
 def pdbqt_to_sdf(pdbqt_file=None, output=None):
+    """ Took this function straight from https://github.com/AngelRuizMoreno/Jupyter_Dock """
 
     results = [m for m in pybel.readfile(filename=pdbqt_file, format='pdbqt')]
     out = pybel.Outputfile(filename=output, format='sdf', overwrite=True)

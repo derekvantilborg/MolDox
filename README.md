@@ -6,6 +6,8 @@ docking box dimensions, fast docking, and visualizing the results without the us
 
 Inspired by https://github.com/AngelRuizMoreno/Jupyter_Dock
 
+![MolDox logo](img/MolDox.png?raw=true "Title")
+
 ***
 
 ## Installation

@@ -4,7 +4,7 @@ from vina import Vina
 from docking.prepare_receptor import prep_receptor
 from docking.prepare_ligands import hydrogenate_mol_from_file, prep_mol_from_file, prep_ligands
 from docking.utils import find_box, pdbqt_to_sdf
-from viewer.mol3d import Viewer
+from docking.viewer import Mol3D, InteractionMap
 import os
 from os.path import basename
 
@@ -125,12 +125,12 @@ class MolDox:
                                                   ligand_format=ligand_format,
                                                   box_extension=box_extension)
 
-    def autodock_all(self, receptor_pdbqt=None, box_center=None, box_size=None,
+    def autodock_all(self, receptor_pdbqt=None, box_center=None, box_size=None, box_extension=5,
                      exhaustiveness=10, n_poses=10, scoring_function='vina', cpu_cores=0, seed=42):
 
         if box_center is None or box_size is None:
             if self.box_center is None or self.box_size is None:
-                self.find_box()
+                self.find_box(box_extension=box_extension)
             box_center = [self.box_center['center_x'], self.box_center['center_y'], self.box_center['center_z']]
             box_size = [self.box_size['size_x'], self.box_size['size_y'], self.box_size['size_z']]
 
@@ -141,6 +141,7 @@ class MolDox:
             os.mkdir(f"{self.output_dir}/docking_results")
 
         # Perform the docking for every ligand
+        print(f"Docking {len(self.ligands_pdbqt)} ligands")
         for lig, lig_pdbqt in self.ligands_pdbqt.items():
             autodock_vina(receptor_pdbqt=receptor_pdbqt,
                           ligand_pdbqt=lig_pdbqt,
@@ -180,14 +181,42 @@ class MolDox:
                       exhaustiveness=exhaustiveness, n_poses=n_poses,
                       scoring_function=scoring_function, cpu_cores=cpu_cores, seed=seed)
 
-    def viewer(self):
-        self.view = Viewer()
-        self.view.add_layer(self.receptor_hydrogenated)
-        self.view.add_surface(color='white', opacity=0.75)
+    def interactions(self, docking_results_sdf):
+
+        if not docking_results_sdf.endswith('.sdf'):
+            docking_results_sdf = self.docking_results[docking_results_sdf]
+
+        self.interaction_map = InteractionMap(self.receptor_hydrogenated, docking_results_sdf)
+        return self.interaction_map.show()
+
+    def viewer(self, receptor=None, ligand=None, receptor_color='white', surface_opacity=0.75, ligand_color='cyan',
+               ligand_colorscheme=None, ligand_opacity=1):
+
+        if receptor is None:
+            receptor = self.receptor_hydrogenated
+        if ligand is None:
+            ligand = self.ref_ligand_hydrogenated
+
+        self.view = Mol3D()
+        self.view.add_layer(receptor)
+        self.view.add_surface(color=receptor_color, opacity=surface_opacity)
         self.view.cartoon()
-        self.view.add_layer(self.ref_ligand_hydrogenated)
-        self.view.sticks()
+        self.view.add_layer(ligand)
+        self.view.sticks(color=ligand_color, colorscheme=ligand_colorscheme, opacity=ligand_opacity)
         self.view.add_outline()
+
+    def viewer_add_ligand(self, ligand, pose=0, color='orange', colorscheme=None, opacity=1):
+        if self.view is None:
+            self.viewer()
+
+        if not ligand.endswith('.sdf'):
+            ligand = self.docking_results[ligand]
+
+        results=Chem.SDMolSupplier(ligand)
+        p = Chem.MolToMolBlock(results[pose], False)
+
+        self.view.add_layer_from_object(p)
+        self.view.sticks(color=color, colorscheme=colorscheme, opacity=opacity)
 
     def show(self):
         if self.view is None:
@@ -198,6 +227,9 @@ class MolDox:
 def autodock_vina(receptor_pdbqt, ligand_pdbqt, output_file, box_center, box_size, exhaustiveness=10, n_poses=10,
                   scoring_function='vina', cpu_cores=0, seed=42):
     """
+
+    The vina scoring function (lower is better) is a hybrid function described in doi: 10.1002/jcc.21334, PMID: 19499576
+
 
     :param receptor_pdbqt: (str) path to receptor pdbqt file
     :param ligand_pdbqt: (str) path to ligand pdbqt file

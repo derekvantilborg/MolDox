@@ -34,7 +34,6 @@ class MolDox:
 
         self.view = None
 
-
     def prep_reference_ligand(self, ref_ligand=None, ref_ligand_pdbqt=None, ref_ligand_hydrogenated=None):
 
         # Set and remember the pathnames of input/intermediate/output files
@@ -42,14 +41,17 @@ class MolDox:
             self.ref_ligand = ref_ligand
 
         if ref_ligand_hydrogenated is None:
-            self.ref_ligand_hydrogenated = f'{self.output_dir}/{basename(self.ref_ligand).split(".")[0]}_H.mol2'
+            # self.ref_ligand_hydrogenated = f'{self.output_dir}/{basename(self.ref_ligand).split(".")[0]}_H.mol2'
+            self.ref_ligand_hydrogenated = os.path.join(self.output_dir, f'{basename(self.ref_ligand).split(".")[0]}_H.mol2')
         else:
-            self.ref_ligand_hydrogenated = f'{self.output_dir}/{ref_ligand_hydrogenated}'
+            # self.ref_ligand_hydrogenated = f'{self.output_dir}/{ref_ligand_hydrogenated}'
+            self.ref_ligand_hydrogenated = os.path.join(self.output_dir, ref_ligand_hydrogenated)
 
         if ref_ligand_pdbqt is None:
             self.ref_ligand_pdbqt = f"{self.ref_ligand_hydrogenated}".replace('mol2', 'pdbqt')
         else:
-            self.ref_ligand_pdbqt = f'{self.output_dir}/{ref_ligand_pdbqt}'
+            # self.ref_ligand_pdbqt = f'{self.output_dir}/{ref_ligand_pdbqt}'
+            self.ref_ligand_pdbqt = os.path.join(self.output_dir, ref_ligand_pdbqt)
 
         # test_output/1AZ8_lig.mol2_H.pdb
 
@@ -62,12 +64,17 @@ class MolDox:
 
         self.ligands = infile
 
-        if not os.path.exists(f"{self.output_dir}/ligands"):
-            os.mkdir(f"{self.output_dir}/ligands")
+        # if not os.path.exists(f"{self.output_dir}/ligands"):
+        #     os.mkdir(f"{self.output_dir}/ligands")
+        if not os.path.exists(os.path.join(self.output_dir, 'ligands')):
+            os.mkdir(os.path.join(self.output_dir, 'ligands'))
+
+
 
         prep_ligands(infile,
                      format=format,
-                     output_dir=f"{self.output_dir}/ligands",
+                     # output_dir=f"{self.output_dir}/ligands",
+                     output_dir=os.path.join(self.output_dir, 'ligands'),
                      hydrogenate=hydrogenate,
                      hydrate=hydrate,
                      keep_nonpolar_hydrogens=keep_nonpolar_hydrogens,
@@ -79,8 +86,10 @@ class MolDox:
                      steps_3d_localopt=steps_3d_localopt)
 
         # Add all pdbqt files of the prepped ligands to a dict
-        for pdbqt in os.listdir(f"{self.output_dir}/ligands"):
-            self.ligands_pdbqt[pdbqt.split('.')[0]] = f"{self.output_dir}/ligands/{pdbqt}"
+        # for pdbqt in os.listdir(f"{self.output_dir}/ligands"):
+        #     self.ligands_pdbqt[pdbqt.split('.')[0]] = f"{self.output_dir}/ligands/{pdbqt}"
+        for pdbqt in os.listdir(os.path.join(self.output_dir, 'ligands')):
+            self.ligands_pdbqt[pdbqt.split('.')[0]] = os.path.join(self.output_dir, 'ligands', pdbqt)
 
     def prep_receptor(self, receptor=None, ligand=None, receptor_hydrogenated=None, receptor_pdbqt=None,
                       ph=7.4, keep_water=True, renumber=True, verbose=True):
@@ -90,14 +99,18 @@ class MolDox:
             self.receptor = receptor
 
         if receptor_hydrogenated is None:
-            self.receptor_hydrogenated = f'{self.output_dir}/{basename(self.receptor).split(".pdb")[0]}_H.pdb'
+            # self.receptor_hydrogenated = f'{self.output_dir}/{basename(self.receptor).split(".pdb")[0]}_H.pdb'
+            self.receptor_hydrogenated = os.path.join(self.output_dir, f'{basename(self.receptor).split(".pdb")[0]}_H.pdb')
         else:
-            self.receptor_hydrogenated = f'{self.output_dir}/{receptor_hydrogenated}'
+            # self.receptor_hydrogenated = f'{self.output_dir}/{receptor_hydrogenated}'
+            self.receptor_hydrogenated = os.path.join(self.output_dir, receptor_hydrogenated)
 
         if receptor_pdbqt is None:
-            self.receptor_pdbqt = f"{self.output_dir}/{basename(self.receptor_hydrogenated)}qt"
+            # self.receptor_pdbqt = f"{self.output_dir}/{basename(self.receptor_hydrogenated)}qt"
+            self.receptor_pdbqt = os.path.join(self.output_dir, f"{basename(self.receptor_hydrogenated)}qt")
         else:
-            self.receptor_pdbqt = f'{self.output_dir}/{receptor_pdbqt}'
+            # self.receptor_pdbqt = f'{self.output_dir}/{receptor_pdbqt}'
+            self.receptor_pdbqt = os.path.join(self.output_dir, receptor_pdbqt)
 
         # Actually clean the receptor pdb
         prep_receptor(input_pdb=self.receptor,
@@ -137,15 +150,21 @@ class MolDox:
         if receptor_pdbqt is None:
             receptor_pdbqt = self.receptor_pdbqt
 
-        if not os.path.exists(f"{self.output_dir}/docking_results"):
-            os.mkdir(f"{self.output_dir}/docking_results")
+        # if not os.path.exists(f"{self.output_dir}/docking_results"):
+        #     os.mkdir(f"{self.output_dir}/docking_results")
+
+        if not os.path.exists(os.path.join(self.output_dir, 'docking_results')):
+            os.mkdir(os.path.join(self.output_dir, 'docking_results'))
+
+
 
         # Perform the docking for every ligand
         print(f"Docking {len(self.ligands_pdbqt)} ligands")
         for lig, lig_pdbqt in self.ligands_pdbqt.items():
             autodock_vina(receptor_pdbqt=receptor_pdbqt,
                           ligand_pdbqt=lig_pdbqt,
-                          output_file=f"{self.output_dir}/docking_results/{lig}.sdf",
+                          # output_file=f"{self.output_dir}/docking_results/{lig}.sdf",
+                          output_file=os.path.join(self.output_dir, 'docking_results', f"{lig}.sdf"),
                           box_center=box_center,
                           box_size=box_size,
                           exhaustiveness=exhaustiveness,
@@ -154,7 +173,8 @@ class MolDox:
                           cpu_cores=cpu_cores,
                           seed=seed)
 
-            self.docking_results[lig] = f"{self.output_dir}/docking_results/{lig}.sdf"
+            # self.docking_results[lig] = f"{self.output_dir}/docking_results/{lig}.sdf"
+            self.docking_results[lig] = os.path.join(self.output_dir, 'docking_results', f"{lig}.sdf")
 
 
     def dock(self, ligand_pdbqt=None, receptor_pdbqt=None, output_file=None, box_center=None, box_size=None,
@@ -174,7 +194,8 @@ class MolDox:
 
         # If no output name is given, use a generic name
         if output_file is None:
-            output_file = f"{self.output_dir}/docking_results.sdf"
+            # output_file = f"{self.output_dir}/docking_results.sdf"
+            output_file = os.path.join(self.output_dir, "docking_results.sdf")
 
         # Perform the docking
         autodock_vina(receptor_pdbqt, ligand_pdbqt, output_file, box_center, box_size,

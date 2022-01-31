@@ -88,7 +88,8 @@ def prep_ligands(infile, format='sdf', output_dir='.', hydrogenate=True, hydrate
                                          pH_value=pH_value)
         preparator.prepare(m.OBMol)
 
-        preparator.write_pdbqt_file(f"{output_dir}/mol_{idx}.pdbqt")
+        # preparator.write_pdbqt_file(f"{output_dir}/mol_{idx}.pdbqt")
+        preparator.write_pdbqt_file(os.path.join(output_dir, f"mol_{idx}.pdbqt"))
 
 
 

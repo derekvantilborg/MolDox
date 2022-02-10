@@ -43,7 +43,7 @@ pip install jupyter
 
 ### Conda installation
 
-MolDox can be simple be installed as
+MolDox can be simply be installed as:
 
 ```conda install -c derekvantilborg -c conda-forge -c schrodinger moldox```
 
@@ -54,7 +54,7 @@ First clone the git repository:
 
 ```git clone https://github.com/derekvantilborg/MolDox```
 
-Install pymol, openbabel, rdkit, MDAnalysis, pdbfixer, vina, py3Dmol, meeko, and jupyter
+Install pymol, openbabel, rdkit, MDAnalysis, pdbfixer, vina, and py3Dmol
 ```
 conda install -c conda-forge -c schrodinger pymol-bundle
 conda install -c conda-forge openbabel

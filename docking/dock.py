@@ -1,4 +1,5 @@
 from rdkit import Chem
+from rdkit.Chem import PandasTools
 from vina import Vina
 from docking.prepare_receptor import prep_receptor
 from docking.prepare_ligands import hydrogenate_mol_from_file, prep_mol_from_file, prep_ligands
@@ -6,6 +7,7 @@ from docking.utils import find_box, pdbqt_to_sdf
 from docking.viewer import Mol3D#, InteractionMap
 import os
 from os.path import basename
+import pandas as pd
 
 
 class MolDox:
@@ -32,6 +34,7 @@ class MolDox:
         self.docking_results = {}
 
         self.view = None
+        self.summary = None
 
     def prep_reference_ligand(self, ref_ligand=None, ref_ligand_pdbqt=None, ref_ligand_hydrogenated=None):
 
@@ -175,6 +178,8 @@ class MolDox:
             # self.docking_results[lig] = f"{self.output_dir}/docking_results/{lig}.sdf"
             self.docking_results[lig] = os.path.join(self.output_dir, 'docking_results', f"{lig}.sdf")
 
+        self.get_summary()
+
 
     def dock(self, ligand_pdbqt=None, receptor_pdbqt=None, output_file=None, box_center=None, box_size=None,
              exhaustiveness=10, n_poses=10, scoring_function='vina', cpu_cores=0, seed=42):
@@ -201,6 +206,8 @@ class MolDox:
                       exhaustiveness=exhaustiveness, n_poses=n_poses,
                       scoring_function=scoring_function, cpu_cores=cpu_cores, seed=seed)
 
+        self.get_summary()
+
     # def interactions(self, docking_results_sdf):
     #
     #     if not docking_results_sdf.endswith('.sdf'):
@@ -208,6 +215,35 @@ class MolDox:
     #
     #     self.interaction_map = InteractionMap(self.receptor_hydrogenated, docking_results_sdf)
     #     return self.interaction_map.show()
+
+    def get_summary(self):
+        """Get a sorted dataframe of the docking results"""
+        if self.docking_results != {}:
+            summary = []
+            # read every results file and get the best docking score
+            for mol, mol_pth in self.docking_results.items():
+                try:
+                    best_score = None
+                    idx_score = False
+                    with open(mol_pth) as file:
+                        for idx, line in enumerate(file):
+                            if idx_score:
+                                best_score = float(line.rstrip())
+                                break
+                            if 'Score' in line.rstrip():
+                                idx_score = True
+                    # Get the smiles of this mol
+                    mol_smiles = Chem.MolToSmiles(Chem.SDMolSupplier(mol_pth)[0])
+                    # Append row to df
+                    summary.append([mol, best_score, mol_smiles])
+                except:
+                    print(f"Could not process mol {mol}")
+
+            # Convert to pandas df
+            summary = pd.DataFrame(summary, columns=['Ligand', 'Affinity (kcal/mol)', 'SMILES'])
+            self.summary = summary.sort_values(by=['Affinity (kcal/mol)'], ascending=True)
+            # Add molecule pictures from the SMILES column in the df
+            PandasTools.AddMoleculeColumnToFrame(self.summary, 'SMILES', 'Molecule')
 
     def viewer(self, receptor=None, ligand=None, receptor_color='white', surface_opacity=0.75, ligand_color='cyan',
                ligand_colorscheme=None, ligand_opacity=1):

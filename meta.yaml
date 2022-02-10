@@ -1,10 +1,10 @@
 
 package:
-  name: "MolDOx"
+  name: "moldox"
   version: "1.0.0"
 
 source:
-  git_rev: v1.0.0
+  git_rev: main
   git_url: https://github.com/derekvantilborg/MolDox
 
 requirements:
@@ -14,14 +14,14 @@ requirements:
   build:
     - python=3.8
   run:
-    - python
-    - conda-forge::schrodinger::openbabel
-    - conda-forge::openbabel
-    - conda-forge::rdkit
-    - conda-forge::MDAnalysis
-    - conda-forge::pdbfixer
-    - conda-forge::vina
-    - conda-forge::py3Dmol
+    - python=3.8
+    - pymol-bundle
+    - openbabel
+    - rdkit
+    - MDAnalysis
+    - pdbfixer
+    - vina
+    - py3Dmol
 
 
 about:

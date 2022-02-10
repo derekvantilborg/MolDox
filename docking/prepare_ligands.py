@@ -22,12 +22,11 @@ import time
 #     out.close()
 
 
-def prep_mol_from_file(infile, output_pdbqt, hydrate=False, keep_nonpolar_hydrogens=False, pH_value=None):
+def prep_mol_from_file(infile, output_pdbqt, hydrate=False, keep_nonpolar_hydrogens=False):
     mol = obutils.load_molecule_from_file(infile)
 
     preparator = MoleculePreparation(hydrate=hydrate,
-                                     keep_nonpolar_hydrogens=keep_nonpolar_hydrogens,
-                                     pH_value=pH_value)
+                                     keep_nonpolar_hydrogens=keep_nonpolar_hydrogens)
     preparator.prepare(mol)
 
     preparator.write_pdbqt_file(output_pdbqt)
@@ -84,8 +83,7 @@ def prep_ligands(infile, format='sdf', output_dir='.', hydrogenate=True, hydrate
     # Prep for docking and write to file
     for idx, m in enumerate(mols):
         preparator = MoleculePreparation(hydrate=hydrate,
-                                         keep_nonpolar_hydrogens=keep_nonpolar_hydrogens,
-                                         pH_value=pH_value)
+                                         keep_nonpolar_hydrogens=keep_nonpolar_hydrogens)
         preparator.prepare(m.OBMol)
 
         # preparator.write_pdbqt_file(f"{output_dir}/mol_{idx}.pdbqt")

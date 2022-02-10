@@ -1,10 +1,9 @@
 from rdkit import Chem
-from pymol import cmd
 from vina import Vina
 from docking.prepare_receptor import prep_receptor
 from docking.prepare_ligands import hydrogenate_mol_from_file, prep_mol_from_file, prep_ligands
 from docking.utils import find_box, pdbqt_to_sdf
-from docking.viewer import Mol3D, InteractionMap
+from docking.viewer import Mol3D#, InteractionMap
 import os
 from os.path import basename
 
@@ -202,13 +201,13 @@ class MolDox:
                       exhaustiveness=exhaustiveness, n_poses=n_poses,
                       scoring_function=scoring_function, cpu_cores=cpu_cores, seed=seed)
 
-    def interactions(self, docking_results_sdf):
-
-        if not docking_results_sdf.endswith('.sdf'):
-            docking_results_sdf = self.docking_results[docking_results_sdf]
-
-        self.interaction_map = InteractionMap(self.receptor_hydrogenated, docking_results_sdf)
-        return self.interaction_map.show()
+    # def interactions(self, docking_results_sdf):
+    #
+    #     if not docking_results_sdf.endswith('.sdf'):
+    #         docking_results_sdf = self.docking_results[docking_results_sdf]
+    #
+    #     self.interaction_map = InteractionMap(self.receptor_hydrogenated, docking_results_sdf)
+    #     return self.interaction_map.show()
 
     def viewer(self, receptor=None, ligand=None, receptor_color='white', surface_opacity=0.75, ligand_color='cyan',
                ligand_colorscheme=None, ligand_opacity=1):

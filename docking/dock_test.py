@@ -1,40 +1,37 @@
-from meeko import MoleculePreparation
-from meeko import obutils
-from openbabel import pybel
-from openbabel import openbabel
-import os
 
-from rdkit import Chem
-from rdkit.Chem import Draw
-from pdbfixer import PDBFixer
-from openmm.app import PDBFile
-import py3Dmol
+from docking.dock import MolDox
 from pymol import cmd
-from rdkit.Chem import AllChem, rdFMCS, rdMolAlign
-
-from pdbfixer import PDBFixer
-from openmm.app import PDBFile
-
-import MDAnalysis as mda
-from MDAnalysis.coordinates import PDB
-import random, math
-import numpy as np
-from vina import Vina
-
-from MDAnalysis.coordinates import PDB
-import os
-import prolif as plf
-from prolif.plotting.network import LigNetwork
-
-from docking.prepare import fix_protein, sanitize_mol2, getbox, prepare_ligand, pdbqt_to_sdf
-from docking.prepare_receptor import prep_receptor
-from docking.utils import find_box
+from rdkit import Chem
 
 
-output_dir = 'test_output'
+# cmd.fetch(code='1AZ8',type='pdb1')
+# cmd.select(name='Prot',selection='polymer.protein')
+# cmd.select(name='Lig',selection='organic')
+# cmd.save(filename='test_output/1AZ8_clean.pdb',format='pdb',selection='Prot')
+# cmd.save(filename='test_output/1AZ8_lig.mol2',format='mol2',selection='Lig')
+# cmd.delete('all')
+
+# cmd.fetch(code='1AZ8',type='pdb1')
+cmd.load("example/4ypq.pdb")
+cmd.select(name='Prot', selection='polymer.protein')
+cmd.select(name='Lig', selection='organic')
+cmd.save(filename='test_output2/4ypq_clean.pdb',format='pdb',selection='Prot')
+cmd.save(filename='test_output2/4ypq_lig.mol2',format='mol2',selection='Lig')
+cmd.delete('all')
+
+dox = MolDox(output_dir='test_output2')
+dox.prep_receptor(receptor='test_output2/4ypq_clean.pdb',
+                  ligand='test_output2/4ypq_lig.mol2',
+                  ph=7.4, keep_water=True, renumber=True)
+
+# dox.prep_reference_ligand('test_output2/4ypq_lig.mol2')
+
+dox.prep_ligands('example/RORytligand_testDerek.sdf', format='sdf')
+
+dox.autodock_all()
 
 
-
+dox.docking_results
 
 #################
 # Fetch pdb     #
@@ -123,5 +120,30 @@ p = Chem.MolToMolBlock(results[0], False)
 
 
 #####
+
+import random
+color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])]
+
+
+#
+
+poses = Chem.SDMolSupplier('test_output/1AZ8_lig_vina_out.sdf',True)
+for p in list(poses):
+    pose_1 = Chem.MolToMolBlock(p)
+    # print(p.GetProp('_Name'), 'Score: {}'.format(p.GetProp('minimizedAffinity')))
+
+    print(p.GetProp('_Name'), p.GetProp('Score'))
+    # p.GetProp('')
+
+
+
+cmd.fetch(code='1X1R',type='pdb1')
+cmd.select(name='Prot',selection='polymer.protein')
+cmd.select(name='GDP',selection='organic')
+cmd.save(filename='1X1R_clean.pdb',format='pdb',selection='Prot')
+cmd.save(filename='1X1R_GDP.mol2',format='mol2',selection='GDP')
+cmd.delete('all')
+
+
 
 

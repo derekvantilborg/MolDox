@@ -17,9 +17,9 @@ Example:
 """
 
 import py3Dmol
-import prolif as plf
-from prolif.plotting.network import LigNetwork
-import MDAnalysis as mda
+# import prolif as plf
+# from prolif.plotting.network import LigNetwork
+# import MDAnalysis as mda
 
 
 class Mol3D:
@@ -116,27 +116,27 @@ class Mol3D:
 
 
 
-class InteractionMap:
-    def __init__(self, receptor, docking_results):
-        self.receptor = receptor  # path to cleaned pdb
-        self.docking_results = docking_results  # path to sdf file from autodock
-        self.ligands = list(plf.sdf_supplier(docking_results))
-
-        # Create mda object of the receptor
-        self.protein = mda.Universe(self.receptor)
-        self.protein = plf.Molecule.from_mda(self.protein)
-
-        print('Looking for interactions between receptor and ligand')
-        self.interaction_table()
-        self.interaction_network()
-
-    def interaction_table(self):
-        fp = plf.Fingerprint()
-        fp.run_from_iterable(self.ligands, self.protein)
-        self.interactions = fp.to_dataframe(return_atoms=True)
-
-    def interaction_network(self, n_ligand=0):
-        self.net = LigNetwork.from_ifp(self.interactions, self.ligands[n_ligand], kind="frame", frame=0, rotation=270)
-
-    def show(self):
-        return self.net.display()
+# class InteractionMap:
+#     def __init__(self, receptor, docking_results):
+#         self.receptor = receptor  # path to cleaned pdb
+#         self.docking_results = docking_results  # path to sdf file from autodock
+#         self.ligands = list(plf.sdf_supplier(docking_results))
+#
+#         # Create mda object of the receptor
+#         self.protein = mda.Universe(self.receptor)
+#         self.protein = plf.Molecule.from_mda(self.protein)
+#
+#         print('Looking for interactions between receptor and ligand')
+#         self.interaction_table()
+#         self.interaction_network()
+#
+#     def interaction_table(self):
+#         fp = plf.Fingerprint()
+#         fp.run_from_iterable(self.ligands, self.protein)
+#         self.interactions = fp.to_dataframe(return_atoms=True)
+#
+#     def interaction_network(self, n_ligand=0):
+#         self.net = LigNetwork.from_ifp(self.interactions, self.ligands[n_ligand], kind="frame", frame=0, rotation=270)
+#
+#     def show(self):
+#         return self.net.display()

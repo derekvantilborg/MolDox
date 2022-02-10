@@ -45,7 +45,7 @@ pip install jupyter
 
 MolDox can be simple be installed as
 
-```conda install -c derekvantilborg moldox```
+```conda install -c derekvantilborg moldox -c conda-forge -c schrodinger```
 
 ### Manual installation
 In special cases, you can install it manually as well.

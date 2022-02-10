@@ -23,56 +23,54 @@ Inspired by https://github.com/AngelRuizMoreno/Jupyter_Dock
 ***
 MolDox currently supports Python 3.8
 
-- [vina](https://vina.scripps.edu/)
-- [pymol](https://anaconda.org/schrodinger/pymol-bundle)
-- [openbabel](https://anaconda.org/openbabel/openbabel)
-- [pdbfixer](https://anaconda.org/omnia/pdbfixer)
-- [MDAnalysis](https://www.mdanalysis.org/pages/installation_quick_start/)
-- [rdkit](https://www.rdkit.org/)
-- [py3Dmol](https://github.com/avirshup/py3dmol)
-- [meeko](https://github.com/forlilab/Meeko)
-- [ProLIF](https://github.com/chemosim-lab/ProLIF)
+- [conda](https://anaconda.org/)
+- [meeko v0.2](https://github.com/forlilab/Meeko) |```pip install meeko==0.2```
+
 
 ## Installation
 ***
-MolDox can *NOT YET* be installed as
 
-```pip install git+https://github.com/derekvantilborg/MolDox.git```
+
+It is advised to create separate conda environment
+
+```
+conda create -n moldox python=3.8
+conda activate moldox
+```
+
+### Conda installation
+
+MolDox can be simple be installed as
+
+```conda install -c derekvantilborg moldox```
 
 ### Manual installation
-In the mean time you can install it manually:
+In special cases, you can install it manually as well.
+
+First clone the git repository:
 
 ```git clone https://github.com/derekvantilborg/MolDox```
 
-Create a conda environment
-
-```
-conda create -n docking python=3.8
-conda activate moldox
-```
-Install pymol, openbabel, rdkit, MDAnalysis, pdbfixer
+Install pymol, openbabel, rdkit, MDAnalysis, pdbfixer, vina, py3Dmol, meeko, and jupyter
 ```
 conda install -c conda-forge -c schrodinger pymol-bundle
 conda install -c conda-forge openbabel
 conda install -c conda-forge rdkit
 conda install -c conda-forge MDAnalysis
-conda install -c conda-forge MDAnalysisTests
 conda install -c conda-forge pdbfixer
-```
-Pip install vina, py3Dmol, meeko, ProLIF, and jupyter
-```
-pip install vina
-pip install py3Dmol
-pip install meeko
-pip install cyton  # required for ProLIF
-pip install git+https://github.com/chemosim-lab/ProLIF.git
+conda install -c conda-forge vina
+conda install -c conda-forge py3Dmol
+pip install meeko==0.2
 pip install jupyter
 ```
 
 ## Getting started
 ***
 
-A tutorial can be found [here](https://github.com/derekvantilborg/MolDox/blob/main/moldox.ipynb) that features fetching
+The easiest way to get started is opening up the included Jupyter Notebook.
+Simply type ```jupyter-notebook``` in the terminal and open ```moldox.ipynb```.
+
+An example of this notebook can be found [here](https://github.com/derekvantilborg/MolDox/blob/main/moldox.ipynb). It features fetching
 a pdb + ligand from the internet and re-docking it.
 
 

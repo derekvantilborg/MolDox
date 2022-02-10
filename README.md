@@ -23,8 +23,9 @@ Inspired by https://github.com/AngelRuizMoreno/Jupyter_Dock
 ***
 MolDox currently supports Python 3.8
 
-- [conda](https://anaconda.org/)
+- [conda](https://anaconda.org/) | Conda must be installed first
 - [meeko v0.2](https://github.com/forlilab/Meeko) |```pip install meeko==0.2```
+- [Jupyter](https://jupyter.org/) |```pip install jupyter```
 
 
 ## Installation
@@ -36,6 +37,8 @@ It is advised to create separate conda environment
 ```
 conda create -n moldox python=3.8
 conda activate moldox
+pip install meeko==0.2
+pip install jupyter
 ```
 
 ### Conda installation
@@ -60,8 +63,6 @@ conda install -c conda-forge MDAnalysis
 conda install -c conda-forge pdbfixer
 conda install -c conda-forge vina
 conda install -c conda-forge py3Dmol
-pip install meeko==0.2
-pip install jupyter
 ```
 
 ## Getting started

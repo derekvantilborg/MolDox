@@ -1,0 +1,33 @@
+
+package:
+  name: "MolDOx"
+  version: "1.0.0"
+
+source:
+  git_rev: v1.0.0
+  git_url: https://github.com/derekvantilborg/MolDox
+
+requirements:
+  host:
+    - python
+    - setuptools
+  build:
+    - python=3.8
+  run:
+    - python
+    - conda-forge::schrodinger::openbabel
+    - conda-forge::openbabel
+    - conda-forge::rdkit
+    - conda-forge::MDAnalysis
+    - conda-forge::pdbfixer
+    - conda-forge::vina
+    - conda-forge::py3Dmol
+
+
+about:
+  home: https://github.com/derekvantilborg/MolDox
+  license: MIT
+  license_familY: MIT
+  license_file: LICENSE
+  summary: "Easy Molecular Docking"
+

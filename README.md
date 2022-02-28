@@ -1,7 +1,7 @@
 # MolDox
 ***
 
-![MolDox logo](img/Mol Dox.png?raw=true "Title")
+![MolDox logo](img/MolDox.png?raw=true "Title")
 
 ### Easy to use docking tool based on autodock Vina.
 **MolDox takes care of prepping your receptor and ligand(s) from various input formats, defining the 

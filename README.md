@@ -11,7 +11,7 @@ Inspired by https://github.com/AngelRuizMoreno/Jupyter_Dock
 
 
 
-![Docking_example](img/moldox_example.png?raw=true "Docking")
+
 
 
 ## Features
@@ -80,5 +80,5 @@ a pdb + ligand from the internet and re-docking it.
 
 
 
-
+![Docking_example](img/moldox_example.png?raw=true "Docking")
 

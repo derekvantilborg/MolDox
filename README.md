@@ -1,13 +1,17 @@
 # MolDox
 ***
+
+![MolDox logo](img/MolDox.png?raw=true "Title")
+
 ### Easy to use docking tool based on autodock Vina.
 **MolDox takes care of prepping your receptor and ligand(s) from various input formats, defining the 
 docking box dimensions, fast docking, and visualizing the results without the use of external executables.**
 
-
 Inspired by https://github.com/AngelRuizMoreno/Jupyter_Dock
 
-![MolDox logo](img/MolDox.png?raw=true "Title")
+
+
+![Docking_example](img/moldox_example.png?raw=true "Docking")
 
 
 ## Features
